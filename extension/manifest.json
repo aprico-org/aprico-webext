@@ -1,0 +1,30 @@
+{
+  "description": "Aprico is the world easiest password manager. Free and open-source.",
+  "manifest_version": 2,
+  "name": "Aprico",
+  "version": "0.1.0",
+  "homepage_url": "https://aprico.org",
+  "icons": {
+    "48": "assets/aprico-48.png",
+    "96": "assets/aprico-96.png"
+  },
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L",
+        "mac": "Command+Shift+L"
+      }
+    }
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "clipboardWrite"
+  ],
+  "browser_action": {
+    "browser_style": false,
+    "default_icon": "assets/aprico-32.png",
+    "default_title": "Apricos",
+    "default_popup": "popup.html"
+  }
+}
