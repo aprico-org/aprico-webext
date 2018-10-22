@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "vendor-copy && npm run build-js",
-    "build-js": "browserify -i buffer src/js/main.js | uglifyjs > extension/dist/js/bundle.js",
+    "build-js": "browserify -i buffer src/js/main.js -o extension/dist/js/bundle.js",
     "watch": "watchify -i buffer src/js/main.js -o extension/dist/js/bundle.js -v"
   },
   "repository": {
