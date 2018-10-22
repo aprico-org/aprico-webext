@@ -4,6 +4,7 @@
   "name": "Aprico: Free Password Manager",
   "version": "0.1.0",
   "homepage_url": "https://aprico.org",
+  "author": "Pino Ceniccola",
   "icons": {
     "48": "assets/aprico-48.png",
     "96": "assets/aprico-96.png"
