@@ -2230,7 +2230,7 @@ exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate :
 },{"process/browser.js":8,"timers":10}],11:[function(require,module,exports){
 
 
-const apricoUi = require('aprico-ui-fix');
+const apricoUi = require('aprico-ui');
 
 apricoUi('#aprico');
-},{"aprico-ui-fix":2}]},{},[11]);
+},{"aprico-ui":2}]},{},[11]);

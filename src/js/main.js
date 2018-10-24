@@ -1,5 +1,5 @@
 
 
-const apricoUi = require('aprico-ui-fix');
+const apricoUi = require('aprico-ui');
 
 apricoUi('#aprico');
