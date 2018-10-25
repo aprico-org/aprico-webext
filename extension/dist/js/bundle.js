@@ -334,17 +334,17 @@ if (typeof module !== 'undefined' && module.exports) {
 	window.aprico = aprico;
 }
 },{"scrypt-async":9}],2:[function(require,module,exports){
-
-/*
-  Aprico UI: 
-  implementation of Aprico
-
-*/
+/*!
+ * aprico-ui
+ * Universal UI implementation for the Aprico Password Manager. 
+ * Copyright (c) 2018 Pino Ceniccola | GPLv3
+ * https://aprico.org
+ */
 
 'use strict';
 
 
-const VERSION = '0.1.0';
+const VERSION = '0.1.2';
 
 const aprico = require('aprico-gen');
 
@@ -384,7 +384,7 @@ const isWebExt = (typeof browser !== 'undefined' && browser.runtime && browser.r
  *  name in Edge. 
  */
 
-if (isWebExt && typeof chrome === "undefined") window.chrome = window.browser;
+if (isWebExt && typeof chrome === "undefined") window.chrome = browser;
 
 
 
@@ -778,8 +778,7 @@ module.exports.version = VERSION_TREE;
 
 },{"./templates.js":3,"./utils.js":4,"aprico-gen":1,"identicon.js":6}],3:[function(require,module,exports){
 /*
-  Aprico Templates
-
+ * Aprico UI Templates
 */
 
 const templates = {
@@ -789,13 +788,16 @@ const templates = {
       <label class="label">ID</label>
       <input type="text" id="ap-hashid" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
   	</div>
+  	<div class="mb2 h6">
+  		<p><strong>Please choose an ID:</strong> it can be your e-mail address, your nickname or a longer passphrase.</p>
+      <p>It will be only asked once, but please, <strong>make sure to remeber it</strong> as there is no way to recover your ID.</p>
+    </div>
   	<div class="mb2">
-  		<p class="h6">Please choose an ID: it can be your e-mail address, your nickname or a longer passphrase.</p>
-		<p class="h6">It will be asked only once, but please, <strong>make sure to remeber it</strong>, there is no way to recover your ID.</p>
-  	</div>
-  	<div class="-mb2">
       <button id="ap-trigger-login" class="btn btn-primary h6 caps white">Start using Aprico</button>
   	</div>
+    <div class="border-top border-gray-2 pt2">
+      <p class="h6"><strong>Aprico</strong> is a deterministic password manager that works 100% in your browser. No data will ever be sent to any server or cloud. You can read more in our super friendly <a href="https://aprico.org/privacy.html">Privacy Policy</a>.</h6>
+    </div>
     </div>
   	`,
 	main: `
