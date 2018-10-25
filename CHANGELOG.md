@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## 0.1.1 - 2018-10-22
+## 0.1.1 - 2018-10-25
 ### Updated
 - Aprico-ui to version 0.1.2
 ### Added
