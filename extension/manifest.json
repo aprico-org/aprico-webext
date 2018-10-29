@@ -1,20 +1,27 @@
 {
-  "description": "Aprico is the easiest to use password manager you’ll ever find. Free and open-source.",
   "manifest_version": 2,
-  "name": "Aprico: Free Password Manager",
+  "name": "aprico: Free Password Manager",
+  "short_name": "aprico",
+  "description": "aprico is the easiest-to-use password manager you’ll ever find. Free and open-source.",
   "version": "0.1.1",
   "homepage_url": "https://aprico.org",
   "author": "Pino Ceniccola",
   "icons": {
+    "16": "assets/aprico-16.png",
+    "19": "assets/aprico-19.png",
+    "32": "assets/aprico-32.png",
     "48": "assets/aprico-48.png",
-    "96": "assets/aprico-96.png"
+    "64": "assets/aprico-64.png",
+    "96": "assets/aprico-96.png",
+    "128": "assets/aprico-128.png"
   },
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {
-        "default": "Ctrl+Shift+L",
-        "mac": "Command+Shift+L"
-      }
+        "default": "Ctrl+Space",
+        "mac": "Command+Space"
+      },
+      "description": "Open aprico password manager"
     }
   },
   "permissions": [
@@ -24,8 +31,21 @@
   ],
   "browser_action": {
     "browser_style": false,
-    "default_icon": "assets/aprico-32.png",
-    "default_title": "Aprico",
+    "default_icon": {
+      "16": "assets/aprico-16.png",
+      "19": "assets/aprico-19.png",
+      "32": "assets/aprico-32.png",
+      "48": "assets/aprico-48.png",
+      "64": "assets/aprico-64.png"
+    },
+    "default_title": "aprico",
     "default_popup": "popup.html"
-  }
+  },
+  "applications": {
+    "gecko": {
+      "id": "pino@aprico.org",
+      "strict_min_version": "52.0"
+    }
+  },
+  "minimum_chrome_version" : "55"
 }
