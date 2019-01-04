@@ -3,7 +3,7 @@ All notable changes to `aprico-webext` will be documented in this file.
 
 ## Unreleased
 ### Updated
-- Manifest.json: New browser action shortcut (`ctrl|cmd+Space`)
+- Manifest.json: New browser action shortcut (`ctrl|cmd+Shift+.`)
 
 ### Added
 - New icon sizes
