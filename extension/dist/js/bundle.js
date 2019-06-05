@@ -1,6 +1,6 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 /*!
- * Aprico-gen
+ * aprico-gen
  * Deterministic password generator library based on scrypt algorithm. 
  * Copyright (c) 2018 Pino Ceniccola | GPLv3
  * https://aprico.org
@@ -12,9 +12,9 @@ const aprico = (()=> {
 	const scrypt = (typeof module !== 'undefined' && module.exports) ? require('scrypt-async') : window.scrypt;
 
 	if (typeof scrypt !== 'function')
-		throw new Error("Aprico requires scrypt-async-js library.");
+		throw new Error("aprico requires scrypt-async-js library.");
 
-	const VERSION = "1.0.0";
+	const VERSION = "1.1.0";
 
 	const SCRYPT_COST = {
     	N: Math.pow(2,14),
@@ -52,12 +52,10 @@ const aprico = (()=> {
 	* using Base 10 as an intermediate base for conversion.
 	* Used by _hashToAlphabet().
 	* (Adapted from: https://rot47.net/base.html)
-	*
-	* @param {string} src 	  	String to convert
-	* @param {string} srctable	Source character set
-	* @param {string} srcdest	Destination character set
-	*
-	* @returns {string} 	   	Converted string
+	* @param {string} src - String to convert.
+	* @param {string} srctable - Source character set.
+	* @param {string} srcdest - Destination character set.
+	* @returns {string} Converted string.
 	*/
 	const _convert = (src, srctable, desttable) => {
 		const srclen = srctable.length;
@@ -84,10 +82,8 @@ const aprico = (()=> {
 	/**
 	 * Convert full hex hash to password format
 	 * set by options (alphabet and length)
-	 *
-	 * @param   {string} hash 	Hash in hex format
-	 *
-	 * @returns {string} 		The generated password
+	 * @param {string} hash - Hash in hex format.
+	 * @returns {string} The generated password.
 	 */
 	const _hashToAlphabet = (hash) => {
 		let alphabet = '';
@@ -101,20 +97,20 @@ const aprico = (()=> {
 		let split = hash.match(/(.{1,7})/g);
 		for (let i = 0, l = split.length-1; i < l; i++) {
 
-    		//[debug] console.log('Split', split);
+			//[debug] console.log('Split', split);
 
-    		// Re-hash every slice when revealing a potentially
-    		// large chunk of the original hash.
-    		if (options.length > 9) {
+			// Re-hash every slice when revealing a potentially
+			// large chunk of the original hash.
+			if (options.length > 9) {
 
-    			//[debug] console.log('Re-hashing', hash, split[l-i-1]);
+				//[debug] console.log('Re-hashing', hash, split[l-i-1]);
 
-    			scrypt (hash, split[l-i-1], SCRYPT_COST_FAST, function(hash){
-    				split = hash.match(/(.{1,7})/g);
-    			});
-    		}
+				scrypt (hash, split[l-i-1], SCRYPT_COST_FAST, (hash) => {
+					split = hash.match(/(.{1,7})/g);
+				});
+			}
 
-    		result += _convert(split[i], '0123456789abcdef', alphabet);
+			result += _convert(split[i], '0123456789abcdef', alphabet);
 
 		};
 
@@ -147,10 +143,8 @@ const aprico = (()=> {
 	/**
 	 * Check if the generated password has characters from
 	 * every alphabet set. If not, re-hash until conditions are met.
-	 *
-	 * @param   {object} results	Password + Hash
-	 *
-	 * @returns {object} 			Password + Hash
+	 * @param {object} results - Password + Hash.
+	 * @returns {object} Password + Hash.
 	 */
 	const _checkAndIterate = (results) => {
 
@@ -176,7 +170,7 @@ const aprico = (()=> {
 				//[debug] console.log('Iterating', results);
 
 				// Re-hash until conditions are met.
-				scrypt (results.hash, results.pass, SCRYPT_COST_FAST, function(hash){
+				scrypt (results.hash, results.pass, SCRYPT_COST_FAST, (hash) => {
 
 					results.hash = hash;
 					results.pass = _hashToAlphabet(hash);
@@ -194,8 +188,7 @@ const aprico = (()=> {
 
 	/**
 	 * Merge and check user options.
-	 *
-	 * @param   {object} user_options	User options
+	 * @param {object} user_options	- User options.
 	 */
 	const _checkOptions = (user_options) => {
 
@@ -220,13 +213,11 @@ const aprico = (()=> {
 
 	/**
 	 * Deterministic password generation main function.
-	 *
-	 * @param   {string} password		User Master Password
-	 * @param   {string} service		User service/domain
-	 * @param   {string} hashId			Precomputed hash ID
-	 * @param   {object} user_options	User options
-	 *
-	 * @returns {object} 				Password + Hash
+	 * @param {string} password	- User Master Password.
+	 * @param {string} service - User service/domain.
+	 * @param {string} hashId - Precomputed hash ID.
+	 * @param {object} user_options	- User options.
+	 * @returns {object} Password + Hash.
 	 */
 	const getPassword = (password, service, hashId, user_options) => {
 
@@ -242,7 +233,7 @@ const aprico = (()=> {
 
 		let results = {};
 
-		scrypt (pass, hashId, SCRYPT_COST, function(hash){
+		scrypt (pass, hashId, SCRYPT_COST, (hash) => {
 
 			results.hash = hash;
 			results.pass = _hashToAlphabet(hash);
@@ -260,28 +251,26 @@ const aprico = (()=> {
 
 
 	/**
-	 * Generate an hash from the user ID.
-	 *
-	 * @param   {string} id 	User ID
-	 *
-	 * @returns {string} 		Hash ID
+	 * Generate a hash from the user ID.
+	 * @param {string} id - User ID.
+	 * @returns {string} Hash ID.
 	 */
 	const getHashId = (id) => {
 		let output = '';
 
-		// In order to create an hash from the ID using scrypt,
+		// In order to create a hash from the ID using scrypt,
 		// we need to generate some deterministic salt and it's
 		// not a bad thing.
 		// Rationale: ID is a salt. It's not a secret.
 		// We are not hashing a password.
-		// We are converting ID to an hash more for convenience 
+		// We are converting ID to a hash more for convenience 
 		// than security here.
 		let salt = Math.pow(id.length, (id.match(/[aeiou]/gi) || [0,0,0]).length)+'';
 		salt = _convert(salt, '0123456789.e+Infity', ALPHABET.numbers+ALPHABET.symbols+ALPHABET.letters)+'';
 
 		//[debug] console.log('Hash ID salt',salt);
 
-		scrypt(id, salt, SCRYPT_COST, function(hash) {
+		scrypt(id, salt, SCRYPT_COST, (hash) => {
 			output = hash;
 		});
 
@@ -292,10 +281,8 @@ const aprico = (()=> {
 	/**
 	 * If Service is a URL, it is stripped down to hostname (and
 	 * perhaps port number) to improve usability.
-	 *
-	 * @param   {string} service 	User Service
-	 *
-	 * @returns {string} 			Normalized Service
+	 * @param {string} service - User Service.
+	 * @returns {string} - Normalized Service.
 	 */
 	const normalizeService = (service) => {
 
@@ -333,10 +320,10 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
 	window.aprico = aprico;
 }
-},{"scrypt-async":9}],2:[function(require,module,exports){
+},{"scrypt-async":11}],2:[function(require,module,exports){
 /*!
  * aprico-ui
- * Universal UI implementation for the Aprico Password Manager. 
+ * Universal UI component for Aprico Password Manager. 
  * Copyright (c) 2018 Pino Ceniccola | GPLv3
  * https://aprico.org
  */
@@ -344,7 +331,7 @@ if (typeof module !== 'undefined' && module.exports) {
 'use strict';
 
 
-const VERSION = '0.1.2';
+const VERSION = require('./version.js');
 
 const aprico = require('aprico-gen');
 
@@ -361,11 +348,13 @@ const Identicon = require('identicon.js');
 
 const DEFAULT_TEMPLATES = require('./templates.js');
 
+// Temporary, to be replaced with proper i18n someday
+const TIPS = require('./tips.js');
+
 const utils = require('./utils.js');
 
+const platform = utils.detectPlatform();
 
-
-const isWebExt = (typeof browser !== 'undefined' && browser.runtime && browser.runtime.id) || (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id);
 
 /**
  *  Web Extension API, state of the art.
@@ -384,7 +373,7 @@ const isWebExt = (typeof browser !== 'undefined' && browser.runtime && browser.r
  *  name in Edge. 
  */
 
-if (isWebExt && typeof chrome === "undefined") window.chrome = browser;
+if (platform.webext && typeof chrome === "undefined") window.chrome = browser;
 
 
 
@@ -413,25 +402,23 @@ const hashIdKey = 'hashId_' + VERSION_TREE['aprico-gen'].replace(/\./g , "_");
 
 
 
-
-
 function setHashId(hashId) {
   _hashId = hashId;
-  if (isWebExt) {
-    chrome.storage.local.set({'hashId': hashId}, renderMain);
+  if (platform.webext) {
+	chrome.storage.local.set({'hashId': hashId}, renderMain);
   } else {
-    localStorage.setItem('hashId', hashId);
-    renderMain();
+	localStorage.setItem('hashId', hashId);
+	renderMain();
   }
 }
 
 function resetHashId() {
   _hashId = false;
-  if (isWebExt) {
-    chrome.storage.local.set({'hashId': ''}, renderLogin);
+  if (platform.webext) {
+	chrome.storage.local.set({'hashId': ''}, renderLogin);
   } else {
-    localStorage.setItem('hashId', '');
-    renderLogin();
+	localStorage.setItem('hashId', '');
+	renderLogin();
   }
 }
 
@@ -439,11 +426,11 @@ function resetHashId() {
 function onHashId(result) {
   //console.log(result);
   if (result && result.hashId) {
-    _hashId = result.hashId;
-    renderMain();
+	_hashId = result.hashId;
+	renderMain();
   } else {
-    _hashId = false;
-    renderLogin();
+	_hashId = false;
+	renderLogin();
   }
 }
 
@@ -466,21 +453,17 @@ function bootstrap(element, user_template){
 
   template = (user_template) ? user_template : DEFAULT_TEMPLATES;
 
-  if (isWebExt) {
-    _root.classList.add('aprico-webext');
-    chrome.storage.local.get('hashId', onHashId);
+  utils.setPlatformCSSClasses(platform, _root);
+
+  if (platform.webext) {
+	chrome.storage.local.get('hashId', onHashId);
   } else {
-    _root.classList.add('aprico-browser');
-    let hashId = localStorage.getItem('hashId');
-    onHashId({ 'hashId' : hashId });
+	let hashId = localStorage.getItem('hashId');
+	onHashId({ 'hashId' : hashId });
   }
 
+
 }
-
-
-
-
-
 
 
 
@@ -499,6 +482,7 @@ function renderLogin() {
   _root.appendChild(node);
   
   setupLogin();
+  setupCommon();
 }
 
 
@@ -511,6 +495,7 @@ function renderMain() {
   _root.appendChild(node);
 
   setupMain();
+  setupCommon();
 }
 
 
@@ -521,13 +506,13 @@ function setupLogin(){
   let $login = utils.getId('ap-trigger-login');
   $hashId.focus();
   $login.addEventListener('click',function(e){
-      e.preventDefault();
-      if ($hashId.value) {
-        _hashId = aprico.getHashId($hashId.value);
-        setHashId(_hashId);
-      } else {
-        $hashId.focus();
-      }
+	  e.preventDefault();
+	  if ($hashId.value) {
+		_hashId = aprico.getHashId($hashId.value);
+		setHashId(_hashId);
+	  } else {
+		$hashId.focus();
+	  }
   });
 
 };
@@ -557,170 +542,166 @@ function setupMain(){
   let $resultDiv    = utils.getId('aprico-result');
   let $aboutDiv     = utils.getId('aprico-about');
 
+  // Render random tip
+  randomTip();
+
   // Autofocus Service or Password inputs
-  if (isWebExt) {
-    chrome.tabs.query({active:true,currentWindow:true}, function(tabs){
-      if (tabs[0].url.indexOf('.') > 0) {
-        $service.value = aprico.normalizeService(tabs[0].url);
-        $pass.focus();
-      } else {
-        $service.focus();
-      }
-    });
+  if (platform.webext) {
+	chrome.tabs.query({active:true,currentWindow:true}, function(tabs){
+	  if (tabs[0].url.indexOf('.') > 0) {
+		$service.value = aprico.normalizeService(tabs[0].url);
+		$pass.focus();
+	  } else {
+		$service.focus();
+	  }
+	});
   } else {
-    $service.focus();
+	$service.focus();
   }
   
 
   // Normalize Service on blur
   $service.addEventListener('blur',function(e){
-    this.value = aprico.normalizeService(this.value);
+	this.value = aprico.normalizeService(this.value);
   });
 
 
   // Identicon support
   $pass.addEventListener('input',function(e){
-    if (this.value.length) {
-      // this.value to base64 because tiny-sha256 works with ASCII only
-      let value64 = btoa(encodeURIComponent(this.value).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-          return String.fromCharCode(parseInt(p1, 16));
-      }));
-      let data = new Identicon(sha256(_hashId+value64), IDENTICON_OPTIONS).toString();
-      $pass.style.backgroundImage = 'url(data:image/svg+xml;base64,' + data + ')';
-    } else {
-      $pass.style.backgroundImage = '';
-    }
-  });
-
-
-  // Simulate submission
-  $pass.addEventListener('keyup',function(e){
-     if (e.key === "Enter") generate();
+	if (this.value.length) {
+	  // this.value to base64 because tiny-sha256 works with ASCII only
+	  let value64 = btoa(encodeURIComponent(this.value).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+		  return String.fromCharCode(parseInt(p1, 16));
+	  }));
+	  let data = new Identicon(sha256(_hashId+value64), IDENTICON_OPTIONS).toString();
+	  $pass.style.backgroundImage = 'url(data:image/svg+xml;base64,' + data + ')';
+	} else {
+	  $pass.style.backgroundImage = '';
+	}
   });
 
 
   // Extra
   $triggerExtra.addEventListener('click',function(e){
-    e.preventDefault();
-    if (this.classList.contains('bg-gray-1')) {
-      this.classList.remove('bg-gray-1');
-      show($aboutDiv);
-    } else {
-      this.classList.add('bg-gray-1');
-      show($extraDiv);
-    }
-    
+	e.preventDefault();
+	if (this.classList.contains('bg-gray-2')) {
+	  this.classList.remove('bg-gray-2');
+	  show($aboutDiv);
+	} else {
+	  this.classList.add('bg-gray-2');
+	  show($extraDiv);
+	}
+	
   });
 
 
   // Switch Password type
   $result.addEventListener('focus', function(){
-    this.type = 'text';
+	this.type = 'text';
   });
   $result.addEventListener('blur', function(){
-    this.type = 'password';
+	this.type = 'password';
   });
 
 
 
   // Generating Password
-  $trigger.addEventListener('click', generate);
 
   async function generate(e) {
-    // 0. Validate fields
-    if (!$service.value) {$service.focus();return false;}
-    if (!$pass.value) {$pass.focus();return false;}
-    
-    let timerId,
-        results,
-        copy;
+	// 0. Validate fields
+	if (!$service.value) {$service.focus();return false;}
+	if (!$pass.value) {$pass.focus();return false;}
+	
+	let timerId,
+		results,
+		copy;
 
 
-    // 1. Prepare UI
-    let step1 = await new Promise(function(resolve) {
+	// 1. Prepare UI
+	let step1 = await new Promise(function(resolve) {
 
-      $label.classList.remove('icon','icon-done','icon-alldone');
-      $triggerCopy.classList.add('hidden');
-      $triggerShow.classList.add('hidden');
-      $result.classList.remove('border-red');
+	  $label.classList.remove('icon','icon-done','icon-alldone');
+	  $triggerCopy.classList.add('hidden');
+	  $triggerShow.classList.add('hidden');
+	  $result.classList.remove('border-red');
 
-      $triggerExtra.classList.remove('bg-gray-1');
+	  $triggerExtra.classList.remove('bg-gray-2');
 
-      show($resultDiv);
+	  show($resultDiv);
 
-      //utils.getId('aprico-result').classList.add('bg-black');
+	  //utils.getId('aprico-result').classList.add('bg-black');
 
-      timerId = setInterval(function(){
-        $label.textContent += '.';
-      },50);
+	  timerId = setInterval(function(){
+		$label.textContent += '.';
+	  },50);
 
-      $label.classList.add('red');
-      $label.textContent = 'Generating.';
-          
-      $trigger.disabled = true;
-      $triggerExtra.disabled = true;
-      $result.value = '';
+	  $label.classList.add('red');
+	  $label.textContent = 'Generating.';
+		  
+	  $trigger.disabled = true;
+	  $triggerExtra.disabled = true;
+	  $result.value = '';
 
-      return setTimeout(resolve,100);
-    });
+	  return setTimeout(resolve,100);
+	});
 
-    // 2. Generate Password
-    let step2 = await new Promise(function(resolve){
-      
-      let time = new Date().getTime();
+	// 2. Generate Password
+	let step2 = await new Promise(function(resolve){
+	  
+	  let time = new Date().getTime();
 
-      results = aprico.getPassword($pass.value, $service.value, _hashId, {
-        length:  +$length.value,
-        letters: +$letters.checked,
-        numbers: +$numbers.checked,
-        symbols: +$symbols.checked,
-        variant: $variant.value
-      });
+	  results = aprico.getPassword($pass.value, $service.value, _hashId, {
+		length:  +$length.value,
+		letters: +$letters.checked,
+		numbers: +$numbers.checked,
+		symbols: +$symbols.checked,
+		variant: $variant.value
+	  });
 
-      //console.log((new Date().getTime()) - time);
+	  //console.log((new Date().getTime()) - time);
 
-      // in step 2 because... timing
-      $result.value = results.pass;
-      results = false;
-      copy = utils.copyToClipboard($result);
+	  // in step 2 because... timing
+	  $result.value = results.pass;
+	  results = false;
+	  copy = utils.copyToClipboard($result);
 
-      return setTimeout(resolve,100);
-    });
+	  return setTimeout(resolve,100);
+	});
 
-    // 3. Resolve UI
-    let step3 = await new Promise(function(resolve){
+	// 3. Resolve UI
+	let step3 = await new Promise(function(resolve){
 
-      $result.classList.add('border-red');
+	  $result.classList.add('border-red');
 
-      $label.classList.remove('red');
+	  $label.classList.remove('red');
 
-      clearInterval(timerId);
+	  clearInterval(timerId);
 
-      if (copy) {
-        $label.classList.add('icon','icon-alldone');
-        $label.textContent = 'Password copied to clipboard.';
-      } else {
-        $label.classList.add('icon','icon-done');
-        $label.textContent = 'Password is ready.';
-        $triggerCopy.classList.remove('hidden');
-      }
+	  if (copy) {
+		$label.classList.add('icon','icon-alldone');
+		$label.textContent = 'Password copied to clipboard.';
+	  } else {
+		$label.classList.add('icon','icon-done');
+		$label.textContent = 'Password is ready.';
+		$triggerCopy.classList.remove('hidden');
+	  }
 
-      $triggerShow.classList.remove('hidden');
-      
-      $trigger.disabled = false;
-      $triggerExtra.disabled = false;
+	  $triggerShow.classList.remove('hidden');
+	  
+	  $trigger.disabled = false;
+	  $triggerExtra.disabled = false;
 
-      return resolve();
-    });
+	  return resolve();
+	});
 
-  
   };
 
 
 
   $triggerCopy.addEventListener('click',function(e){
-    let copy = utils.copyToClipboard($result);
-    if (copy) $label.textContent = 'Password copied to clipboard.';
+	let copy = utils.copyToClipboard($result);
+	if (copy) $label.textContent = 'Password copied to clipboard.'
+	  else alert('There was an error with the clipboard copy.');
   });
 
 
@@ -730,115 +711,189 @@ function setupMain(){
 
   // Show Password
   $triggerShow.addEventListener('click',function(e){
-    $result.focus();
+	$result.focus();
   });
 
   // Switch About/Results
   function show(section){
-    $resultDiv.hidden = true;
-    $aboutDiv.hidden = true;
-    $extraDiv.hidden = true;
-    section.hidden = false;
-  }
+	
+	if (section.id == "aprico-about") randomTip();
+	
+	$resultDiv.hidden = true;
+	$aboutDiv.hidden = true;
+	$extraDiv.hidden = true;
+	section.hidden = false;
+  };
 
-  // hide results on form change
+  // Hide results on form change
   let formEls = document.querySelectorAll('input');
   Array.from(formEls).forEach(function(el){
-    el.addEventListener('input',function(){
-      if ($resultDiv.hidden != true) show($aboutDiv);
-    });
+	el.addEventListener('input',function(){
+	  if ($resultDiv.hidden != true) show($aboutDiv);
+	});
   });
 
   // At least one checkbox selected
+  // Note: Safari doesn't support 'input' event on checkboxes
   let checkboxes = document.querySelectorAll('.switch-toggle');
-
-  [...checkboxes].forEach(checkbox => checkbox.addEventListener('change', checkboxOnChange));
-  
+  Array.from(checkboxes).forEach(checkbox => checkbox.addEventListener('change', checkboxOnChange));
   function checkboxOnChange(){
-    let checkedOne = Array.prototype.slice.call(checkboxes).some(x => x.checked);
-    if (!checkedOne) this.checked = true;
+	let checkedOne = Array.prototype.slice.call(checkboxes).some(x => x.checked);
+	if (!checkedOne) this.checked = true;
+	this.value = this.checked ? 1 : 0;
+
+	// Redundant, but needed for Safari
+	$triggerExtra.classList.toggle('btn-mod-notify', formHasChanges($extraInputs));
   };
 
-  // Validate characters count
-  $length.addEventListener('blur', function(){
-    if (+this.value == 0) this.value = 20;
-    else if (+this.value < 4) this.value = 4;
-    else if (+this.value > 40) this.value = 40;
-  });
-  
+  // Setup fake form submission
+  utils.getId('fake-form').addEventListener('submit', (e) => {
+	e.preventDefault(); 
 
-  // links
-  let $aboutLink = utils.getId('ap-link-about');
-  $aboutLink.addEventListener('click', function(){window.open("https://aprico.org/")});
+	// if PWA trigger Save Password?
+	// Note: not needed in iOS, Android needs tests.
+	// history.replaceState({success:true}, 'aprico', "/success.html");
+	
+	generate();
+
+  });
+
+  // Validate characters count
+  $length.addEventListener('change', () => {
+	if (+$length.value == 0) $length.value = 20;
+	else if (+$length.value < 4) $length.value = 4;
+	else if (+$length.value > 40) $length.value = 40;
+
+	$triggerExtra.classList.toggle('btn-mod-notify', formHasChanges($extraInputs));
+	$length.classList.toggle('border-red', $length.dataset.origValue !== $length.value );
+  });
+
+  // Add notification icon on extra fields change
+  let $extraInputs = document.querySelectorAll('#aprico-extra input');
+
+  Array.from($extraInputs).forEach(el => {
+	el.dataset.origValue = el.value;
+	el.addEventListener('input',e => {
+	  $triggerExtra.classList.toggle('btn-mod-notify', formHasChanges($extraInputs));
+	  el.classList.toggle('border-red', (el.dataset.origValue !== el.value));
+	});
+  });
+
+  function formHasChanges(form) {
+	return Array.from(form).some(el => 'origValue' in el.dataset && el.dataset.origValue !== el.value );
+  }
+
+
+
+  // Tips logic
+  function randomTip() {
+	let _tips = TIPS['common'];
+
+	// Web Extension
+	if (platform.webext) _tips = [..._tips, ...TIPS['webext']];
+	// Mobile but not standalone
+	if (platform.mobile && !platform.standalone) _tips = [..._tips, ...TIPS['mobile']];
+	// Desktop but not web extension
+	if (!platform.mobile && !platform.webext) _tips = [..._tips, ...TIPS['desktop']];
+
+	let tip = _tips[Math.random() * _tips.length | 0];
+
+	let $tip = utils.getId('aprico-tips');
+	while ($tip.firstChild) $tip.removeChild($tip.firstChild);
+	$tip.appendChild( utils.stringToDom(tip) );
+  }
+
+
 }
 
+
+function setupCommon(){
+
+  // links in new window in web-ext
+  if (platform.webext || platform.standalone) {
+	Array.from(document.querySelectorAll('.external-link')).forEach(
+	  _link => _link.addEventListener('click', (e) => {
+		e.preventDefault();
+		window.open(_link.getAttribute('href'));
+	  })
+	);
+  }
+
+}
 
 module.exports = bootstrap;
 module.exports.version = VERSION_TREE;
 
-},{"./templates.js":3,"./utils.js":4,"aprico-gen":1,"identicon.js":6}],3:[function(require,module,exports){
+},{"./templates.js":3,"./tips.js":4,"./utils.js":5,"./version.js":6,"aprico-gen":1,"identicon.js":8}],3:[function(require,module,exports){
 /*
  * Aprico UI Templates
 */
 
 const templates = {
 	login: `
-  <div id="aprico-login" class="p2 bg-white">
+  <div id="aprico-login" class="p2 sm-p3 bg-white">
 	<div class="mb2">
-      <label class="label">ID</label>
-      <input type="text" id="ap-hashid" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <label class="label" for="ap-hashid">ID</label>
+      <input class="sm-h3" type="text" id="ap-hashid" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
   	</div>
   	<div class="mb2 h6">
-  		<p><strong>Please choose an ID:</strong> it can be your e-mail address, your nickname or a longer passphrase.</p>
-      <p>It will be only asked once, but please, <strong>make sure to remeber it</strong> as there is no way to recover your ID.</p>
+  		<p class="h5"><strong>Please choose an ID:</strong> It can be your email address, your nickname or a longer passphrase.</p>
+      <p><strong>Important:</strong> The ID will be asked only once, <strong>make sure to remember it</strong>, since there is no way to recover it. Without your ID, all the generated passwords will be lost.</p>
     </div>
   	<div class="mb2">
       <button id="ap-trigger-login" class="btn btn-primary h6 caps white">Start using Aprico</button>
   	</div>
-    <div class="border-top border-gray-2 pt2">
-      <p class="h6"><strong>Aprico</strong> is a deterministic password manager that works 100% in your browser. No data will ever be sent to any server or cloud. You can read more in our super friendly <a href="https://aprico.org/privacy.html">Privacy Policy</a>.</h6>
+    <div class="border-top border-gray pt2">
+      <p class="h6 m0"><strong>aprico</strong> is a deterministic password manager that works 100% in your browser. No data will ever be sent to any server or cloud. Read more in our user-friendly <a class="external-link" href="https://aprico.org/privacy.html">Privacy Policy</a>.</h6>
     </div>
     </div>
   	`,
 	main: `
-  <div id="aprico-main">
-  <div class="p2 bg-white">
+  <div id="aprico-main" class="flex flex-column col-12">
+  <div class="p2 sm-p3 bg-white">
   	<div class="mb2">
       <label class="label">Service</label>
-      <input type="text" id="ap-service" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <input class="sm-h3 sm-mb2" type="text" placeholder="website.com or appname" id="ap-service" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
   	</div>
-  	<div class="mb2">
+  	<form id="fake-form" action="login">
+    <div class="mb2">
+      
+      <input id="fake-user-text-field" type="hidden" autocomplete="username" value="aprico master password">
       <label class="label">Master Password</label>
-      <input type="password" id="ap-pass" class="bg-identicon">
+      <input id="ap-pass" class="sm-h3 sm-mb2 bg-identicon" type="password" autocomplete="password">
+      
   	</div>
-  	<div class="-mb2">
+  	<div class="sm-mb2">
     	<div class="flex">
-      	<button id="ap-trigger-gen" class="btn btn-primary white h6 caps" style="margin-left:1px">Get Password</button>
+      	<button type="submit" id="ap-trigger-gen" class="btn btn-primary white h6 caps" style="margin-left:1px">Get Password</button>
       	<span class="flex-auto"></span>
       	<button id="ap-trigger-extra" class="btn h6 caps right icon icon-opts px0 border-gray rounded"><span style="opacity:0">More</span></button>
     	</div>
   	</div>
+    </form>
   </div>
 
-  <div id="aprico-extra" class="bg-gray-1 p2" hidden>
+  <div class="flex-auto flex flex-column bg-gray-1 border-top border-gray-2" style="min-height:220px">
+
+  <div id="aprico-extra" class="p2 sm-p3" hidden>
     <div class="flex justify-between mb2">
-        <div class="-mb2 col-3 ">
+        <div class="sm-mb2 col-3 ">
             <label class="label">Length</label>
-            <input type="number" min="4" max="40" value="20" id="ap-length">
+            <input class="lg-h3" type="number" min="4" max="40" value="20" id="ap-length">
         </div>
-        <div class="-mb2 col-9 flex-auto pl2">
+        <div class="sm-mb2 col-9 flex-auto pl2 sm-pl4 md-pl2 lg-pl4">
             <label class="label">Alphabet</label>
             <ul class="list-reset flex justify-between center">
                 <li>
-                    <input type="checkbox" checked id="ap-letters" class="switch-toggle switch-toggle-round">
+                    <input type="checkbox" checked value="1" id="ap-letters" class="switch-toggle switch-toggle-round">
                     <label for="ap-letters"><span class="mt2 block">Letters</span></label>
                 </li>
                 <li>
-                    <input type="checkbox" checked id="ap-numbers" class="switch-toggle switch-toggle-round">
+                    <input type="checkbox" checked value="1" id="ap-numbers" class="switch-toggle switch-toggle-round">
                     <label for="ap-numbers"><span class="mt2 block">Numbers</span></label>
                 </li>
                 <li>
-                    <input type="checkbox" checked id="ap-symbols" class="switch-toggle switch-toggle-round">
+                    <input type="checkbox" checked value="1" id="ap-symbols" class="switch-toggle switch-toggle-round">
                     <label for="ap-symbols"><span class="mt2 block">Symbols</span></label>
                 </li>
             </ul>
@@ -847,34 +902,39 @@ const templates = {
     <div class="">
         <div class="-mb2">
             <label class="label">Variant</label>
-            <input type="text" id="ap-variant">
+            <input class="sm-h3" type="text" id="ap-variant">
         </div>
     </div>
   </div>
 
-  <div id="aprico-result" class="-bg-black bg-gray-1 -white p2" hidden>
+  <div id="aprico-result" class="p2 sm-p3" hidden>
   <div class="mb2">
-      <label class="label bold -white mb2" id="a-pass-label">Password</label>
-      <input type="password" id="ap-result" class="monospace" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly="true">
+      <label class="label bold mb2" id="a-pass-label">Password</label>
+      <input class="sm-h3 sm-mb2 monospace" type="password" id="ap-result" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly="true">
   </div>
   <div class="flex">
-  <button class="btn btn-small -white h6 px0 hidden mr2 icon icon-view weight-400" id="ap-show">Show</button>
-  <button class="btn btn-small -white h6 px0 hidden icon icon-copy weight-400" id="ap-copy">Copy</button>
+  <button class="btn btn-small h6 px0 hidden mr2 icon icon-view weight-400" id="ap-show">Show</button>
+  <button class="btn btn-small h6 px0 hidden icon icon-copy weight-400" id="ap-copy">Copy</button>
   </div>
   </div>
 
-  <div id="aprico-about">
-  <div class="flex flex-column bg-gray-1" style="min-height:126px">
-  <div class="flex-auto p2">
-  <p class="h5">Thank you for using <strong>Aprico</strong>.</p>
+  <div id="aprico-about" class="flex-auto flex flex-column col-12">
+  <!-- <div class="flex flex-column bg-gray-1"> -->
+  <div class="p2 sm-p3">
+    <p id="aprico-tips" class="h6 md-h5 m0"></p>
   </div>
-  <div class="flex p2">
-  <button id="ap-link-about" class="btn btn-small h6 px0 mr1 icon icon-open weight-400">About</button>
+  <span class="flex-auto"></span>
+  <div class="flex p2 sm-p3">
+  <a class="btn btn-small h6 px0 icon icon-open weight-400 external-link" href="https://aprico.org">About</a>
+  <a class="hide btn btn-small h6 px0 icon icon-open weight-400  ml2 external-link" href="mailto:pino@aprico.org?subject=Feedback%20about%20aprico">Feedback</a>
+
   <button id="ap-link-online" class="hide btn btn-small h6 px0 icon icon-open">Online Version</button>
   <span class="flex-auto"></span>
   <button class="btn btn-small h6 px0 icon icon-logout" id="ap-delete-hash">Change ID</button>
   </div>  
+  <!-- </div> -->
   </div>
+
   </div>
 </div>
 	`
@@ -882,6 +942,29 @@ const templates = {
 
 module.exports = templates;
 },{}],4:[function(require,module,exports){
+// Temporary, to be replaced with proper i18n someday
+
+const tips = {}
+
+tips['common'] = [
+	'Thank you for using <strong>aprico</strong>.',
+	'Have something to say about <strong>aprico</strong>? Feel free to send <a target="_blank" class="external-link" href="mailto:pino@aprico.org">feedback</a>.'
+];
+
+tips['webext'] = [
+	'Easily open aprico with <code><span class="macOS-inline-notice">⌘</span><span class="otherOS-inline-notice">ctrl</span></code> + <code>shift</code> + <code>.</code>'
+];
+
+tips['mobile'] = [
+	'For a better user experience add <strong>aprico</strong> to your home screen.'
+];
+
+tips['desktop'] = [
+	'<strong>aprico</strong> is also available as a browser extension for <a class="external-link" href="https://addons.mozilla.org/firefox/addon/aprico-free-password-manager/">FireFox</a> and <a class="external-link" href="https://chrome.google.com/webstore/detail/aprico-free-password-mana/anghijfdmgonjcmljokbndedjcjdldbk">Chrome</a>.'
+];
+
+module.exports = tips;
+},{}],5:[function(require,module,exports){
 
 'use strict';
 
@@ -914,44 +997,55 @@ utils.stringToDom = function(string){
  * http://hansifer.com/clipboardCopyTest.html
  * https://bugzilla.mozilla.org/show_bug.cgi?id=1012662#c51
  */
-utils.copyToClipboard = function(element) {
+utils.copyToClipboard = function(el) {
  
-  element.type = 'text';
+  el.type = 'text';
 
-  // copy to clipboard
-  element.select();
+  // handle iOS quirks
+  // https://stackoverflow.com/questions/34045777/copy-to-clipboard-using-javascript-in-ios
+  if (navigator.userAgent.match(/ipad|ipod|iphone/i)) {
 
-  // TO DO: ios quirks...
-  // ref: https://stackoverflow.com/questions/34045777/copy-to-clipboard-using-javascript-in-ios
-/*
-            let range = document.createRange();
-            range.selectNodeContents(element);
-            let selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-            element.setSelectionRange(0, 999999);  
-*/
+    // save current contentEditable/readOnly status
+    var editable = el.contentEditable;
+    var readOnly = el.readOnly;
+
+    // convert to editable with readonly to stop iOS keyboard opening
+    el.contentEditable = true;
+    el.readOnly = true;
+
+    // create a selectable range
+    var range = document.createRange();
+    range.selectNodeContents(el);
+
+    // select the range
+    var selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    el.setSelectionRange(0, 999999);
+
+    // restore contentEditable/readOnly to original state
+    el.contentEditable = editable;
+    el.readOnly = readOnly;
+
+  } else {
+    // select for other os/devices
+    el.select();
+  }
+
   let success = document.execCommand("copy");
 
- 	//console.log('copy', success);
+  //console.log('copy', success);
 
-	element.type = 'password';
+  el.type = 'password';
 
   // deselect
-  //var activeEl = document.activeElement;
-  //if ('selectionStart' in activeEl) {
-  //  element.selectionEnd = activeEl.selectionStart;
-  //}
-
-  //if ('selectionStart' in activeEl) {
-    element.selectionEnd = element.selectionStart;
-  //}
+  if ('selectionStart' in el) {
+    el.selectionEnd = el.selectionStart;
+  }
   
-  //selection.removeAllRanges();
+  el.blur();
 
- 	element.blur();
-
-	return success;
+  return success;
 }
 
 
@@ -972,10 +1066,58 @@ utils.chainOnTransitionEnd = function( callback, _this ) {
 };
 
 
-module.exports = utils;
-},{}],5:[function(require,module,exports){
 
+utils.detectPlatform = function() {
+  
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+  let platform = {};
+
+  platform.webext = !!(typeof browser !== 'undefined' && browser.runtime && browser.runtime.id) || !!(typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id);
+
+  platform.macos = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+
+  platform.mobile = !platform.webext && /mobi/i.test(userAgent);
+
+  platform.standalone = platform.mobile && ( (window.navigator.standalone == true) || (window.matchMedia('(display-mode: standalone)').matches) );
+  
+  platform.ios = platform.mobile && (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream);
+
+  platform.android = platform.mobile && (/android/i.test(userAgent) && !window.MSStream);
+
+  return platform;
+
+}
+
+utils.setPlatformCSSClasses = function (platform, element) {
+
+  platform = platform || utils.detectPlatform();
+  element = element || document.body;
+
+  platform.webext ? element.classList.add('platform-webext') : element.classList.add('platform-browser');
+
+  platform.macos ? element.classList.add('platform-macOS') : element.classList.add('platform-otherOS');
+
+  platform.mobile ? element.classList.add('platform-mobile') : element.classList.add('platform-desktop');
+
+  if (platform.mobile) {
+
+    platform.standalone ? element.classList.add('platform-mobile-app') : element.classList.add('platform-mobile-browser');
+  
+    if (platform.ios) { element.classList.add('platform-iOS') } 
+      else if (platform.android) { element.classList.add('platform-android') }
+  }
+}
+
+
+module.exports = utils;
 },{}],6:[function(require,module,exports){
+// generated by genversion
+module.exports = '0.2.0'
+
+},{}],7:[function(require,module,exports){
+
+},{}],8:[function(require,module,exports){
 (function (Buffer){
 /**
  * Identicon.js 2.3.3
@@ -1184,7 +1326,7 @@ module.exports = utils;
 })();
 
 }).call(this,require("buffer").Buffer)
-},{"./pnglib":7,"buffer":5}],7:[function(require,module,exports){
+},{"./pnglib":9,"buffer":7}],9:[function(require,module,exports){
 /**
 * A handy class to calculate color values.
 *
@@ -1400,7 +1542,7 @@ module.exports = utils;
 	}
 })();
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -1586,7 +1728,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (setImmediate){
 /*!
  * Fast "async" scrypt implementation in JavaScript.
@@ -2150,7 +2292,7 @@ function scrypt(password, salt, logN, r, dkLen, interruptStep, callback, encodin
 if (typeof module !== 'undefined') module.exports = scrypt;
 
 }).call(this,require("timers").setImmediate)
-},{"timers":10}],10:[function(require,module,exports){
+},{"timers":12}],12:[function(require,module,exports){
 (function (setImmediate,clearImmediate){
 var nextTick = require('process/browser.js').nextTick;
 var apply = Function.prototype.apply;
@@ -2229,10 +2371,10 @@ exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate :
   delete immediateIds[id];
 };
 }).call(this,require("timers").setImmediate,require("timers").clearImmediate)
-},{"process/browser.js":8,"timers":10}],11:[function(require,module,exports){
+},{"process/browser.js":10,"timers":12}],13:[function(require,module,exports){
 
 
 const apricoUi = require('aprico-ui');
 
 apricoUi('#aprico');
-},{"aprico-ui":2}]},{},[11]);
+},{"aprico-ui":2}]},{},[13]);
