@@ -1617,12 +1617,12 @@ const Identicon = require('identicon.js');
 
 const DEFAULT_TEMPLATES = require('./templates.js');
 
+// Temporary, to be replaced with proper i18n someday
 const TIPS = require('./tips.js');
 
 const utils = require('./utils.js');
 
 const platform = utils.detectPlatform();
-console.log(platform);
 
 
 /**
@@ -1664,15 +1664,6 @@ const hashIdKey = 'hashId_' + VERSION_TREE['aprico-gen'].replace(/\./g , "_");
 
 
 
-
-if (platform.webext) {
-	chrome.commands.onCommand.addListener(function(command) {
-  		if (command == "clear-clipboard") {
-			window.getSelection().removeAllRanges();
-			document.execCommand("copy");
-		}
-	});
-}
 
 
 
@@ -1734,10 +1725,8 @@ function bootstrap(element, user_template){
   utils.setPlatformCSSClasses(platform, _root);
 
   if (platform.webext) {
-	//_root.classList.add('aprico-webext');
 	chrome.storage.local.get('hashId', onHashId);
   } else {
-	//_root.classList.add('aprico-browser');
 	let hashId = localStorage.getItem('hashId');
 	onHashId({ 'hashId' : hashId });
   }
@@ -1981,7 +1970,7 @@ function setupMain(){
   $triggerCopy.addEventListener('click',function(e){
 	let copy = utils.copyToClipboard($result);
 	if (copy) $label.textContent = 'Password copied to clipboard.'
-	  else alert('There was an error with the clipboard copy.')
+	  else alert('There was an error with the clipboard copy.');
   });
 
 
@@ -1996,6 +1985,9 @@ function setupMain(){
 
   // Switch About/Results
   function show(section){
+	
+	if (section.id == "aprico-about") randomTip();
+	
 	$resultDiv.hidden = true;
 	$aboutDiv.hidden = true;
 	$extraDiv.hidden = true;
@@ -2027,7 +2019,7 @@ function setupMain(){
   utils.getId('fake-form').addEventListener('submit', (e) => {
 	e.preventDefault(); 
 
-	// if PWA trigger Save Passord?
+	// if PWA trigger Save Password?
 	// Note: not needed in iOS, Android needs tests.
 	// history.replaceState({success:true}, 'aprico', "/success.html");
 	
@@ -2062,19 +2054,22 @@ function setupMain(){
 
 
 
-  // tips
+  // Tips logic
   function randomTip() {
 	let _tips = TIPS['common'];
 
+	// Web Extension
 	if (platform.webext) _tips = [..._tips, ...TIPS['webext']];
-
+	// Mobile but not standalone
 	if (platform.mobile && !platform.standalone) _tips = [..._tips, ...TIPS['mobile']];
-
-	if (!platform.mobile) _tips = [..._tips, ...TIPS['desktop']];
+	// Desktop but not web extension
+	if (!platform.mobile && !platform.webext) _tips = [..._tips, ...TIPS['desktop']];
 
 	let tip = _tips[Math.random() * _tips.length | 0];
 
-	utils.getId('aprico-tips').appendChild( utils.stringToDom(tip) );
+	let $tip = utils.getId('aprico-tips');
+	while ($tip.firstChild) $tip.removeChild($tip.firstChild);
+	$tip.appendChild( utils.stringToDom(tip) );
   }
 
 
@@ -2135,14 +2130,14 @@ const templates = {
       <input class="sm-h3" type="text" id="ap-hashid" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
   	</div>
   	<div class="mb2 h6">
-  		<p class="sm-h5"><strong>Please choose an ID:</strong> it can be your e-mail address, your nickname or a longer passphrase.</p>
-      <p>It will be only asked once, but please <strong>make sure to remember it</strong> as there is no way to recover your ID.</p>
+  		<p class="h5"><strong>Please choose an ID:</strong> It can be your email address, your nickname or a longer passphrase.</p>
+      <p><strong>Important:</strong> The ID will be asked only once, <strong>make sure to remember it</strong>, since there is no way to recover it. Without your ID, all the generated passwords will be lost.</p>
     </div>
   	<div class="mb2">
       <button id="ap-trigger-login" class="btn btn-primary h6 caps white">Start using Aprico</button>
   	</div>
     <div class="border-top border-gray pt2">
-      <p class="h6 m0"><strong>aprico</strong> is a deterministic password manager that works 100% in your browser. No data will ever be sent to any server or cloud. You can read more in our super friendly <a class="webext-newlink" href="https://aprico.org/privacy.html">Privacy Policy</a>.</h6>
+      <p class="h6 m0"><strong>aprico</strong> is a deterministic password manager that works 100% in your browser. No data will ever be sent to any server or cloud. Read more in our user-friendly <a class="external-link" href="https://aprico.org/privacy.html">Privacy Policy</a>.</h6>
     </div>
     </div>
   	`,
@@ -2219,7 +2214,7 @@ const templates = {
   <div id="aprico-about" class="flex-auto flex flex-column col-12">
   <!-- <div class="flex flex-column bg-gray-1"> -->
   <div class="p2 sm-p3">
-    <p id="aprico-tips" class="h6 md-h5"></p>
+    <p id="aprico-tips" class="h6 md-h5 m0"></p>
   </div>
   <span class="flex-auto"></span>
   <div class="flex p2 sm-p3">
@@ -2240,24 +2235,25 @@ const templates = {
 
 module.exports = templates;
 },{}],11:[function(require,module,exports){
+// Temporary, to be replaced with proper i18n someday
+
 const tips = {}
 
 tips['common'] = [
 	'Thank you for using <strong>aprico</strong>.',
-	'Have something to say about <strong>aprico</strong>? Feel free to send <a href="#">feedback</a>.'
+	'Have something to say about <strong>aprico</strong>? Feel free to send <a target="_blank" class="external-link" href="mailto:pino@aprico.org">feedback</a>.'
 ];
 
 tips['webext'] = [
-	'Easily open aprico with <code><span class="macOS-inline-notice">⌘</span><span class="otherOS-inline-notice">ctrl</span></code> + <code>shift</code> + <code>.</code>',
-	'You can clear the clipboard at any time with <code><span class="macOS-inline-notice">⌘</span><span class="otherOS-inline-notice">ctrl</span></code> + <code>shift</code> + <code>x</code>'
+	'Easily open aprico with <code><span class="macOS-inline-notice">⌘</span><span class="otherOS-inline-notice">ctrl</span></code> + <code>shift</code> + <code>.</code>'
 ];
 
 tips['mobile'] = [
-	'For a better user experience add <strong>aprico</strong> on your home screen: instuctions'
+	'For a better user experience add <strong>aprico</strong> to your home screen.'
 ];
 
 tips['desktop'] = [
-	'<strong>aprico</strong> is also available as a browser extension for <a href="#">FireFox</a> and <a href="#">Chrome</a>.'
+	'<strong>aprico</strong> is also available as a browser extension for <a class="external-link" href="https://addons.mozilla.org/firefox/addon/aprico-free-password-manager/">FireFox</a> and <a class="external-link" href="https://chrome.google.com/webstore/detail/aprico-free-password-mana/anghijfdmgonjcmljokbndedjcjdldbk">Chrome</a>.'
 ];
 
 module.exports = tips;

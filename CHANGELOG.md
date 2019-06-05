@@ -1,8 +1,9 @@
 # Changelog
 All notable changes to `aprico-webext` will be documented in this file.
 
-## Unreleased
+## 0.2.0 - 2019-06-05
 ### Updated
+- Updated aprico-ui to 0.2.0
 - Manifest.json: New browser action shortcut (`ctrl|cmd+Shift+.`)
 
 ### Added

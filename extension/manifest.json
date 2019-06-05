@@ -3,7 +3,7 @@
   "name": "aprico: Free Password Manager",
   "short_name": "aprico",
   "description": "aprico is the easiest-to-use password manager you’ll ever find. Free and open-source.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "homepage_url": "https://aprico.org",
   "author": "Pino Ceniccola",
   "icons": {
