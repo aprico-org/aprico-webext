@@ -1,7 +1,7 @@
 {
   "name": "aprico-webext",
   "description": "Web Extension wrapper for Aprico password manager.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "main": "src/js/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
