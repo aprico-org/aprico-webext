@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to `aprico-webext` will be documented in this file.
 
+## Unreleased
+### Fixed
+- Bump `web-ext` to version 5.0.0
+
 ## 0.2.0 - 2019-06-05
 ### Updated
 - Updated aprico-ui to 0.2.0
